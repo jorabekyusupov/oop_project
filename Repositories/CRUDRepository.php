@@ -10,17 +10,32 @@ class CRUDRepository
     protected $table;
     protected $columns;
 
-
-
-    public function create($data)
+    public function fileUpload()
     {
+        $files = $_FILES['files'];
+        $file_name = $files['name'];
+        $format = pathinfo($file_name, PATHINFO_EXTENSION); // jorabek.jpg => jpg
+        $newNameFile = uniqid('', true) . '.' . $format; /// new name for file / d34sa2323.jpg
+        $path = './Assets/images/' . $newNameFile;
+        move_uploaded_file($files['tmp_name'], $path);
+        return $newNameFile;
+    }
+
+    public function create($data, $file = false, $file_name = 'file')
+    {
+        if ($file) {
+            $data[$file_name] = $this->fileUpload();
+        }
         $columns = implode(',', $this->columns);
         $data = implode("','", $data);
         return $this->db->query("INSERT INTO {$this->table} ({$columns}) VALUES ('{$data}')");
     }
 
-    public function update($id, $data)
+    public function update($id, $data, $file = false, $file_name = 'file')
     {
+        if ($file) {
+            $data[$file_name] = $this->fileUpload();
+        }
         $columns = '';
         $loop = 0;
         foreach ($data as $key => $value) {
@@ -51,19 +66,18 @@ class CRUDRepository
     {
         $conditions = '';
         $loop = 0;
-        foreach ($wheres as $key=>$where) {
+        foreach ($wheres as $key => $where) {
             if (is_array($where)) {
-               [$column, $operator, $value] = $where;
-               $conditions .= "{$column} {$operator} {$value}";
-               // last loop
-               if ($loop == count($wheres) - 1) {
-                   $conditions .= ' ';
-               } else {
-                   $conditions .= ' AND ';
-               }
-            }
-            else{
-                $conditions .= $key.' = '."'{$where}'";
+                [$column, $operator, $value] = $where;
+                $conditions .= "{$column} {$operator} {$value}";
+                // last loop
+                if ($loop == count($wheres) - 1) {
+                    $conditions .= ' ';
+                } else {
+                    $conditions .= ' AND ';
+                }
+            } else {
+                $conditions .= $key . ' = ' . "'{$where}'";
                 if ($loop == count($wheres) - 1) {
                     $conditions .= ' ';
                 } else {
@@ -72,7 +86,7 @@ class CRUDRepository
             }
             $loop++;
         }
-    $columns = implode(',', $columns);
+        $columns = implode(',', $columns);
         return $this->db->query("SELECT {$columns} FROM {$this->table} WHERE {$conditions}")->fetch_all(MYSQLI_ASSOC);
     }
 

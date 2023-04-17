@@ -13,4 +13,4 @@ $company = new Company();
 //        'name' => 'Jorabek'
 //    ]
 //));
-$company->create(['Jorabek']);
+$company->create(['Jorabek'], true, 'logo');
