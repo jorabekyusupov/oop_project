@@ -9,7 +9,7 @@ class UserRepository extends CRUDRepository
     {
         $this->db = (new  Connection())->getConnection();
         $this->table = 'users';
-        $this->columns = ['name', 'email', 'password', 'age'];
+        $this->columns = ['name', 'email', 'password', 'age', 'photo'];
     }
 
 

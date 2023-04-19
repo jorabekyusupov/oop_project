@@ -13,3 +13,5 @@ create table companies(
                           name varchar(255) not null,
                           primary key(id)
 );
+alter table users
+    add column photo varchar(255) null ;
